@@ -19,37 +19,39 @@ for pattern in skill_patterns:
 
 def preprocess_text(raw_text: str) -> str:
     try:
-        return unidecode(raw_text)
+        return unidecode.unidecode(raw_text)
     except Exception as e:
         logger.error(f"Error preprocessing text: {str(e)}")
         return raw_text
     
 def preprocess_query(query: str) -> str:
     try:
+        logger.debug(f"Original query: {query}")
         normalized = query
         doc = nlp(normalized.lower())
         corrected = []
         matches = matcher(doc)
         token_positions = {start: (doc[start:end].text, end) for _, start, end in matches}
         original_tokens = nlp(query)
+        corrections = {
+            "pythn": "Python", "pytn": "Python",
+            "jvascript": "JavaScript", "js": "JavaScript",
+            "squel": "SQL",
+            "jva": "Java",
+            "awz": "AWS"
+        }
+
         i = 0
         while i < len(doc):
             if i in token_positions:
                 skill = token_positions[i][0].lower()
-                corrections = {
-                    "pythn": "Python", "pytn": "Python",
-                    "jvascript": "JavaScript", "js": "JavaScript",
-                    "squel": "SQL",
-                    "jva": "Java",
-                    "awz": "AWS"
-                }
-            corrected_skill = corrections.get(skill, original_tokens[i].text)
-            logger.debug(f"Corrected skill: {skill} -> {corrected_skill}")
-            corrected.append(corrected_skill)
-            i = token_positions[i][1]
-        else:
-            corrected.append(original_tokens[i].text)
-            i += 1
+                corrected_skill = corrections.get(skill, original_tokens[i].text)
+                logger.debug(f"Corrected skill: {skill} -> {corrected_skill}")
+                corrected.append(corrected_skill)
+                i = token_positions[i][1]
+            else:
+                corrected.append(original_tokens[i].text)
+                i += 1
         result = " ".join(corrected)
         logger.info(f"Preprocessed query: {result}")
         return result

@@ -1,0 +1,49 @@
+[
+    {
+        "filename": "1iQDBPq8ltZN5gJpS-TspDOFgZoz9y-Tw.pdf",
+        "extracted_data": {
+            "full_name": "Nguyen Van Tu Cuong",
+            "email": "tucuong1832002@gmail.com",
+            "phone": "+840828.678.897",
+            "education": [
+                {
+                    "degree": "BSc. In Software Engineering",
+                    "institution": "FPT University",
+                    "year": ""
+                }
+            ],
+            "work_experience": [
+                {
+                    "company": "Articloke",
+                    "position": "Scrum Master, Technical Leader and Back-end Developer",
+                    "duration": "",
+                    "description": "A platform for article readers (4 members)",
+                    "achievements": [
+                        "Arranged tasks to team members that are suitable to their capabilities.",
+                        "Constructed the core database, and navigated the team to a coding style.",
+                        "Supported team in several aspects, especially in APIs and SQL Queries."
+                    ]
+                }
+            ],
+            "skills": [
+                "Java",
+                "C#",
+                "SQL",
+                "Bootstrap4",
+                "Entity Framework",
+                "Spring Boot",
+                "Hibernate",
+                "Visual Studio",
+                "Microsoft SQL Server",
+                "Jetbrains",
+                "Git",
+                "Github"
+            ],
+            "projects": [],
+            "certifications": []
+        },
+        "is_valid": true,
+        "candidate_id": 3,
+        "raw_cv_id": 4
+    }
+]

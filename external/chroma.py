@@ -1,5 +1,5 @@
 from typing import Dict, List
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 
 import logging
@@ -21,6 +21,7 @@ def initialize_vector_db(db_path: str = "chroma_db") -> Chroma:
         vector_db = Chroma (
             persist_directory=db_path,
             embedding_function=embedding_model,
+            collection_name="candidates"
         )
         logger.info(f"Initialized vector DB at {db_path}")
         return vector_db
@@ -31,6 +32,7 @@ def initialize_vector_db(db_path: str = "chroma_db") -> Chroma:
 def populate_vector_db(session: Session, vector_db: Chroma) -> None:
     try:
         candidates = session.query(Candidate).all()
+        logger.debug(f"Found {len(candidates)} candidates in database")
         if not candidates:
             logger.info("No candidates found in database")
             return
@@ -58,15 +60,23 @@ def populate_vector_db(session: Session, vector_db: Chroma) -> None:
                 })
 
         if texts:
-            vector_db.db.delete_collection()
-            vector_db = initialize_vector_db()
+            try:
+                if vector_db._collection.count() > 0:
+                    vector_db._collection.delete(where={})
+                logger.debug("Cleared all existing documents in ChromaDB collection")
+            except Exception as e:
+                logger.warning(f"Error deleting collection: {str(e)}")
+
             vector_db.add_texts(
                 texts=texts,
                 metadatas=metadatas
             )
             logger.info(f"Populated vector DB with {len(texts)} candidate embeddings")
+
+            collection_data = vector_db.get()
+            logger.debug(f"Collection contents after population: {len(collection_data.get('ids', []))} items")
         else:
-            logger.info("No valid texts to embed")
+            logger.warning("No valid texts to embed")
     except Exception as e:
         logger.error(f"Error populating vector DB: {str(e)}")
         raise
@@ -89,7 +99,7 @@ def search_candidates(vector_db: Chroma, query: str, k: int = 3) -> List[Dict]:
                     "score": score
                 }
         
-        deduped_results = list(seen_candidate_ids.values())[:k]  # Return top k
+        deduped_results = list(seen_candidate_ids.values())[:k] 
         logger.debug(f"Deduplicated search results: {deduped_results}")
         return deduped_results
     except Exception as e:
